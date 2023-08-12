@@ -23,20 +23,14 @@ async def startProblemSolution(call: CallbackQuery):
     await call.message.answer("Опишите вашу проблему:")
     await State.set(States.ProblemsState)
 
-@dp.callback_query_handler(text=["LearnAboutMTSProducts"], state=States.ChoiceState)
+@dp.callback_query_handler(text=['LearnAboutMTSProducts'], state=States.ChoiceState)
 async def showProducts(call: CallbackQuery):
     await call.message.answer("Выберите категорию", reply_markup=productCategoryChoiceKeyboard)
     await State.set(States.ProductState)
 
 @dp.callback_query_handler(text=["Employee"], state=States.ProductState)
 async def showEmployeeService(call: CallbackQuery):
-    await call.message.answer(("Рабочая область Сотрудники позволяет вам отслеживать работу сотрудников и состояние траспорта вашей компании.\n"
-                               "С ее помощью вы сможете:\n"
-                               "-Получать данные о перемещении сотрудников и траспорта за последние 12 месяцев"
-                               "-Координировать сообщения сотрудников через чат"
-                               "-Автоматизировать отчетность"
-                               "-Контролировать перемещения"
-                               "-Запрашивать местоположение по расписанию"))
+    await call.message.answer(call.message)
     await suggestModules(call)
 
 
@@ -45,6 +39,6 @@ async def exit(call: CallbackQuery):
     await call.message.answer("Надеюсь, я смог вам помочь. Не бойтесь обращаться ко мне за помощью, я постараюсь вам помощь в решении ваших проблем;)")
 
 
-@dp.message_handler()
+@dp.message_handler(state="*")
 async def other(message: types.Message):
     await message.answer("NONOONNO")

@@ -1,0 +1,23 @@
+{
+  "Сотрудники": {
+    "callback_data": "Employee",
+    "transcription" : "This one ueah",
+    "modules": {
+      "Контроль перемещения": {
+        "transcription":  "trulyalya-topolya"
+      },
+      "Сообщения": {
+        "transcription": "messages"
+      }
+    }
+  },
+  "Транспорт": {
+    "callback_data": "Transport",
+    "transcription" : "That one ueah",
+    "modules": {
+      "Где камеры": {
+        "transcription": "Везде"
+      }
+    }
+  }
+}

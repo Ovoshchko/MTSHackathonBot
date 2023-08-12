@@ -1,5 +1,5 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from Loader import categories
+from Loader import categories, categories_transcription, modules, module_transcriptions
 
 exit_button = InlineKeyboardButton(text="Закончить переписку", callback_data="Exit")
 
@@ -11,7 +11,7 @@ def makeKeyboard(buttonsContent: list(())):
 
 
 
-categoryChoiceButtons = [("Решить мою проблему", "SolveTheProblem"), ("Изучить продукты МТС", "LearnAboutMTSProduct")]
+categoryChoiceButtons = [("Решить мою проблему", "SolveTheProblem"), ("Изучить продукты МТС", "LearnAboutMTSProducts")]
 
 def makeModuleKeyboard():
     button1 = InlineKeyboardButton(text="Контроль перемещений", callback_data="Module")
@@ -20,5 +20,5 @@ def makeModuleKeyboard():
 
 categoryChoiceKeyboard = makeKeyboard(categoryChoiceButtons)
 productCategoryChoiceKeyboard = makeKeyboard(categories)
-moduleKeyboard = makeKeyboard()
+moduleKeyboard = makeKeyboard(modules)
 
