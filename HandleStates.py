@@ -1,38 +1,57 @@
 from States import States
 from aiogram import types
-from aiogram import Dispatcher
-from Loader import bot, ms
+from Loader import dp
+from Files.Texts import *
+import random
+from Loader import categories, categories_transcription, modules, module_transcriptions, raw_categories, raw_modules
 from aiogram.types import CallbackQuery
+from OpenAIConnector import getAnswerForQuestion, findSolutionFromMTS, unsuccess_answer
 from aiogram.dispatcher.filters.state import State
-from Keyboards import categoryChoiceKeyboard, productCategoryChoiceKeyboard, makeModuleKeyboard
+from Keyboards import categoryChoiceKeyboard, productCategoryChoiceKeyboard, modules_keyboard, standartKeyboard
 from aiogram.dispatcher.filters import Command
 
-dp = Dispatcher(bot=bot, storage=ms)
-
-
-async def suggestModules(call: CallbackQuery):
-    await call.message.answer("Вы можете позникомиться ближе с услугами, выбрав соответствующий модуль.", reply_markup=makeModuleKeyboard())
+last_category = ""
 
 @dp.message_handler(Command('start'), state="*")
 async def startCommand(message: types.Message):
-    await message.answer("Добрый день для вас и хороший для бизнеса. Я ваш персональный ассисент Мтси. Чем я могу вам помочь?", reply_markup=categoryChoiceKeyboard)
-    await State.set(States.ChoiceState)
+    await message.answer(random.choice(start_messages), reply_markup=categoryChoiceKeyboard)
+    await State.set(States.OptionsChoiceState)
 
-@dp.callback_query_handler(text=['SolveTheProblem'], state=States.ChoiceState)
+@dp.callback_query_handler(text=['РешитьПроблему'], state=States.OptionsChoiceState)
 async def startProblemSolution(call: CallbackQuery):
-    await call.message.answer("Опишите вашу проблему:")
-    await State.set(States.ProblemsState)
+    await call.message.answer(random.choice(problem_asking_messages), reply_markup=standartKeyboard)
+    await State.set(States.ProblemSolvingState)
 
-@dp.callback_query_handler(text=['LearnAboutMTSProducts'], state=States.ChoiceState)
+@dp.message_handler(state=States.ProblemSolvingState)
+async def problemTaken(message: types.Message):
+    answer = await getAnswerForQuestion(message.text)
+    await message.answer(answer)
+    if answer != unsuccess_answer:
+        mts_service = await findSolutionFromMTS(message.text)
+        await message.answer(mts_service)
+        await message.answer(("Вы можете продолжить поиск решений или перейти в основное меню." 
+                         "Я постараюсь помочь вам всем, чем смогу."), reply_markup=standartKeyboard)
+
+@dp.callback_query_handler(text=['ИзучитьПродукт'], state=States.OptionsChoiceState)
 async def showProducts(call: CallbackQuery):
     await call.message.answer("Выберите категорию", reply_markup=productCategoryChoiceKeyboard)
-    await State.set(States.ProductState)
+    await State.set(States.ProductChoiceState)
 
-@dp.callback_query_handler(text=["Employee"], state=States.ProductState)
-async def showEmployeeService(call: CallbackQuery):
-    await call.message.answer(call.message)
-    await suggestModules(call)
+@dp.callback_query_handler(text=raw_categories, state=States.ProductChoiceState)
+async def showCategory(call: CallbackQuery):
+    await call.message.answer(categories_transcription[call.data]+"\nЗдесь представлены модули, входящие в состав сервиса "+call.data+".\nВыберите сервис, про который хотели бы узнать подробнее:", reply_markup=modules_keyboard[call.data])
+    await State.set(States.ModuleChoiceState)
+    global last_category
+    last_category = call.data
 
+@dp.callback_query_handler(text=raw_modules, state=States.ModuleChoiceState)
+async def showModule(call: CallbackQuery):
+    await call.message.answer(module_transcriptions[call.data])
+    await call.message.answer("\nЗдесь представлены модули, входящие в состав сервиса "+call.data+".\n Выберите сервис, про который хотели бы узнать подробнее:", reply_markup=modules_keyboard[last_category])
+
+@dp.callback_query_handler(text=["BackToMenu"], state="*")
+async def back(call: CallbackQuery):
+    await startCommand(call.message)
 
 @dp.callback_query_handler(text=["Exit"], state="*")
 async def exit(call: CallbackQuery):
