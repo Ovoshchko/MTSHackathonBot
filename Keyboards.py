@@ -10,9 +10,11 @@ def makeKeyboard(buttonsContent: list()):
         keyboard.insert(InlineKeyboardButton(text=buttonContent[0], callback_data=buttonContent[1]))
     return keyboard.add(back_button, exit_button)
 
-categoryChoiceButtons = [("Решить мою проблему", "РешитьПроблему"), ("Изучить продукты МТС", "ИзучитьПродукт")]
+categoryChoiceButtons = [("Решить мою проблему", "РешитьПроблему"), ("Изучить продукты МТС", "ИзучитьПродукт"), ("Подобрать услугу", "ПодобратьУслугу")]
+answerButtons = [("Да", "Yes"), ("Нет", "No")]
 
 standartKeyboard = makeKeyboard([])
+answerKeyboard =  makeKeyboard(answerButtons)
 categoryChoiceKeyboard = makeKeyboard(categoryChoiceButtons)
 productCategoryChoiceKeyboard = makeKeyboard(categories)
 modules_keyboard = {}

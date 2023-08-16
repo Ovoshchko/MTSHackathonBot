@@ -6,4 +6,5 @@ class States(StatesGroup):
     ProductChoiceState = State()
     ModuleChoiceState = State()
     ProblemSolvingState = State()
+    ServiceChoiceState = State()
 
